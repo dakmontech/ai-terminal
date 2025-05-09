@@ -2,7 +2,7 @@
 
 Este script convierte tu terminal en una herramienta asistida por IA. Lee tus comandos, analiza la salida y sugiere mejoras o próximos pasos usando la API de OpenAI.
 
-📘 [Read this in english](README.md)
+📘 [Leer en inglés](README.md)
 
 ---
 
@@ -10,7 +10,7 @@ Este script convierte tu terminal en una herramienta asistida por IA. Lee tus co
 
 - Python 3.8+
 - Una clave válida de la API de OpenAI
-- Cualquier distribución moderna de Linux
+- Sistema Linux moderno
 - Acceso a la terminal
 
 ---
@@ -53,6 +53,19 @@ source ~/.zshrc  # o ~/.bashrc
 
 ---
 
+
+---
+
+## 🆕 Funcionalidades nuevas
+
+- ✅ Navegación de directorios simulada con `cd`, incluyendo `cd ..`, `cd ~/`, etc.
+- ✅ Memoria de comandos anteriores para sugerencias más inteligentes.
+- ✅ Mejoras sugeridas por IA basadas en la salida real y el propósito de la sesión.
+- ✅ El prompt refleja dinámicamente el directorio actual (por ejemplo, `~/Downloads>`).
+- ✅ Advertencias para comandos de shell no soportados como `export`, `alias` o `source`.
+
+---
+
 ## ▶️ Uso
 
 Inicia la terminal con IA:
@@ -90,6 +103,20 @@ Este asistente **recuerda los comandos y sugerencias anteriores** para ofrecerte
 ```
 
 ---
+
+
+## ⚠️ Limitaciones
+
+Algunos comandos que dependen de modificar el entorno del shell principal no funcionan como se esperaría, tales como:
+
+- `export`, `alias`, `source`, `unset`, `set`, `exec`, etc.
+- Estos comandos solo afectan al subproceso usado por Python, no a tu terminal real.
+- Comandos como `cd` se simulan internamente y no cambian el directorio real del sistema.
+
+> ℹ️ Si necesitas cambiar variables del entorno o realizar acciones persistentes, hazlo directamente en tu terminal.
+- Estructuras del shell como `function`, `return`, `break` y `time` tampoco son compatibles.
+
+
 
 ## 🛡️ Seguridad
 

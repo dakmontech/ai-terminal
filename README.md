@@ -53,6 +53,19 @@ source ~/.zshrc  # or ~/.bashrc
 
 ---
 
+
+---
+
+## 🆕 Features
+
+- ✅ Simulated directory navigation using `cd`, including `cd ..`, `cd ~/`, etc.
+- ✅ Memory of previous commands for smarter suggestions.
+- ✅ AI-powered improvements based on real output and session purpose.
+- ✅ Command prompt dynamically reflects current working path (e.g. `~/Downloads>`).
+- ✅ Warnings for unsupported shell commands like `export`, `alias`, or `source`.
+
+---
+
 ## ▶️ Usage
 
 Run the AI terminal with:
@@ -90,6 +103,18 @@ This tool **remembers previous commands and suggestions**, allowing it to give s
 ```
 
 ---
+
+
+## ⚠️ Limitations
+
+Some commands that rely on modifying the parent shell environment do not work as expected, such as:
+
+- `export`, `alias`, `source`, `unset`, `set`, `exec`, etc.
+- These affect only the subprocess used by Python, not your real shell session.
+- Commands like `cd` are simulated internally and do not affect your real terminal state.
+
+> ℹ️ If you need to change shell variables or execute persistent environment changes, do so in your main terminal.
+
 
 ## 🛡️ Security
 

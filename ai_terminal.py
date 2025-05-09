@@ -39,17 +39,43 @@ client = OpenAI(api_key=api_key)
 
 # Ask for a free-form purpose
 print("🧠 AI Terminal")
-print("Describe the purpose of this session (e.g. 'learning Linux basics', 'exploring system performance', 'configuring a production Linux server'):")
+print("Describe the purpose of this session (e.g. 'learning Linux basics', 'exploring system performance'):")
 purpose = input("[🔍 Purpose]: ").strip()
 
-# Initialize conversation history
-history = [
-    {"role": "system", "content": f"You are an AI assistant in a Linux terminal session. The purpose is: {purpose}"}
+# Initial working directory and memory
+current_dir = os.path.expanduser("~")
+history = [{"role": "system", "content": f"You are an AI assistant in a Linux terminal session. The purpose is: {purpose}"}]
+
+# Commands that won't work as expected
+unsupported_commands = [
+    "export", "unset", "alias", "unalias", "source", ".", "set", "shopt", "exec",
+    "fg", "bg", "jobs", "read", "trap", "select", "complete", "bind",
+    "function", "return", "break", "time"
 ]
 
 def run_command(command):
+    global current_dir
+
+    cmd = command.strip()
+
+    if not cmd:
+        return ""
+
+    if cmd.startswith("cd"):
+        parts = cmd.split(maxsplit=1)
+        new_path = os.path.expanduser(parts[1] if len(parts) > 1 else "~")
+        new_path = os.path.abspath(os.path.join(current_dir, new_path)) if not os.path.isabs(new_path) else new_path
+        if os.path.isdir(new_path):
+            current_dir = new_path
+            return ""
+        else:
+            return f"cd: no such directory: {parts[1]}"
+
+    if cmd.split()[0] in unsupported_commands:
+        return f"⚠️ The command `{cmd.split()[0]}` may not work properly in this assistant. Try running it in your real shell."
+
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(cmd, shell=True, cwd=current_dir, capture_output=True, text=True)
         return result.stdout + result.stderr
     except Exception as e:
         return str(e)
@@ -85,19 +111,22 @@ print("AI Terminal ready. Type your commands below:")
 
 while True:
     try:
-        cmd = input("> ")
+        display_dir = os.path.relpath(current_dir, os.path.expanduser("~"))
+        prompt = f"~/{display_dir if display_dir != '.' else ''}> ".replace("//", "/")
+        cmd = input(prompt)
+
         if cmd.strip() in ("exit", "quit"):
             break
-        if len(cmd.strip()) < 2:
+        if len(cmd.strip()) < 1:
             continue
 
         output = run_command(cmd)
-        print(output)
+        if output:
+            print(output)
 
         suggestion = ai_suggestion(cmd, output)
         print("🤖", suggestion)
-
-        print("\n⏳ Waiting for your next command...")
+        print("⏳ Waiting for your next command...")
 
     except KeyboardInterrupt:
-        print("\n⛔ Interrupted.")
+        print("⛔ Interrupted.")
